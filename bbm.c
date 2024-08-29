@@ -17,7 +17,57 @@ void convertToBinary(int num) {
     printf("\n\n");
 }
 
+void convertToOctal(int num) {
+    int octal[32];
+    int index = 0;
 
+    while (num > 0) {
+        octal[index] = num % 8;
+        num /= 8;
+        index++;
+    }
+
+    printf("Resultado em octal: ");
+    for (int i = index - 1; i >= 0; i--) {
+        printf("%d", octal[i]);
+    }
+    printf("\n\n");
+}
+
+void convertToHexadecimal(int num) {
+    char hex[32];
+    int index = 0;
+    char hexDigits[] = "0123456789ABCDEF";
+
+    while (num > 0) {
+        hex[index] = hexDigits[num % 16];
+        num /= 16;
+        index++;
+    }
+
+    printf("Resultado em hexadecimal: ");
+    for (int i = index - 1; i >= 0; i--) {
+        printf("%c", hex[i]);
+    }
+    printf("\n\n");
+}
+
+void convertToBCD(int num) {
+    int digits[10];
+    int index = 0;
+
+    while (num > 0) {
+        digits[index] = num % 10;
+        num /= 10;
+        index++;
+    }
+
+    printf("Resultado em BCD: ");
+    for (int i = index - 1; i >= 0; i--) {
+        printf("%04d ", digits[i]);
+    }
+    printf("\n\n");
+}
 
 int main() {
     int num, escolha;
@@ -30,8 +80,6 @@ int main() {
     printf("2 - Para octal\n");
     printf("3 - Para hexadecimal\n");
     printf("4 - Para BCD\n");
-    printf("5 - De base 10  para base com sinal com 16 bits: \n");
-    printf("Converter real em decimal para float e double: \n");
     printf("Escolha: ");
     scanf("%d", &escolha);
 
@@ -55,3 +103,4 @@ int main() {
 
     return 0;
 }
+
