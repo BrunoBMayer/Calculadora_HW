@@ -6,198 +6,287 @@
 // Criação da função convertTo16Bits (19h55 dia 29/08)
 // Criação da função printFloatRepresentation (20h15 dia 29/08)
 // Criação da função printDoubleRepresentation (20h44 dia 29/08)
+// Otimização e organização do codigo (22h10 dia 30/08)
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdint.h>
 
-void convertToBinary(int num) {
-    int binary[32];
-    int index = 0;
-
-    printf("Conversao de %d para binario:\n", num);
-    if (num == 0) {
-        printf("Resultado em binario: 0\n\n");
-        return;
-    }
-
-    while (num > 0) {
-        binary[index] = num % 2;
-        num /= 2;
-        index++;
-    }
-
-    printf("Resultado em binario: ");
-    for (int i = index - 1; i >= 0; i--) {
-        printf("%d", binary[i]);
-    }
-    printf("\n\n");
-}
-
-void convertToOctal(int num) {
-    int octal[32];
-    int index = 0;
-
-    printf("Conversao de %d para octal:\n", num);
-    if (num == 0) {
-        printf("Resultado em octal: 0\n\n");
-        return;
-    }
-
-    while (num > 0) {
-        octal[index] = num % 8;
-        num /= 8;
-        index++;
-    }
-
-    printf("Resultado em octal: ");
-    for (int i = index - 1; i >= 0; i--) {
-        printf("%d", octal[i]);
-    }
-    printf("\n\n");
-}
-
-void convertToHexadecimal(int num) {
-    char hex[32];
-    int index = 0;
-
-    printf("Conversao de %d para hexadecimal:\n", num);
-    if (num == 0) {
-        printf("Resultado em hexadecimal: 0\n\n");
-        return;
-    }
-
-    while (num > 0) {
-        int remainder = num % 16;
-        if (remainder < 10)
-            hex[index] = '0' + remainder;
-        else
-            hex[index] = 'A' + (remainder - 10);
-        num /= 16;
-        index++;
-    }
-
-    printf("Resultado em hexadecimal: ");
-    for (int i = index - 1; i >= 0; i--) {
-        printf("%c", hex[i]);
-    }
-    printf("\n\n");
-}
-
-void convertToBCD(int num) {
-    int digits[10];
-    int index = 0;
-
-    printf("Conversao de %d para BCD:\n", num);
-    if (num == 0) {
-        printf("Resultado em BCD: 0000\n\n");
-        return;
-    }
-
-    while (num > 0) {
-        digits[index] = num % 10;
-        num /= 10;
-        index++;
-    }
-
-    printf("Resultado em BCD: ");
-    for (int i = index - 1; i >= 0; i--) {
-        printf("%04d ", digits[i]);
-    }
-    printf("\n\n");
-}
-
-void convertTo16Bits(int num) {
-    unsigned short int result;
-
-    printf("Conversao de %d para complemento de dois (16 bits):\n", num);
-
-    if (num >= 0) {
-        result = (unsigned short)num;
-    } else {
-        result = (unsigned short)(65536 + num); 
-    }
-
-    printf("Resultado em binario: ");
-    for (int i = 15; i >= 0; i--) {
-        printf("%d", (result >> i) & 1);
-    }
-    printf("\n\n");
-}
-
-void printFloatRepresentation(float num) {
-    unsigned int* ptr = (unsigned int*)&num;
-    unsigned int bits = *ptr;
-
-    printf("Representacao de %.6f em float:\n", num);
-    printf("Bits: ");
-    for (int i = 31; i >= 0; i--) {
-        printf("%d", (bits >> i) & 1);
-    }
-    printf("\n\n");
-}
-
-void printDoubleRepresentation(double num) {
-    unsigned long long* ptr = (unsigned long long*)&num;
-    unsigned long long bits = *ptr;
-
-    printf("Representacao de %.6lf em double:\n", num);
-    printf("Bits: ");
-    for (int i = 63; i >= 0; i--) {
-        printf("%lld", (bits >> i) & 1);
-    }
-    printf("\n\n");
-}
+void baseDois(int n);
+void baseOito(int n);
+void baseDezesseis(int n);
+void baseBCD(int n);
+void complemento2(int n);
+void printFloat(uint32_t num);
+void printDouble(uint64_t num);
+void floatToBinary(float f);
+void doubleToBinary(double d);
+void menu();
 
 int main() {
-    int num, escolha;
-    float fnum;
-    double dnum;
-
-    printf("Digite um numero inteiro em base 10: ");
-    scanf("%d", &num);
-
-    printf("Escolha a conversao:\n");
-    printf("1 - Para binario\n");
-    printf("2 - Para octal\n");
-    printf("3 - Para hexadecimal\n");
-    printf("4 - Para BCD\n");
-    printf("5 - Para complemento de dois (16 bits)\n");
-    printf("6 - Para representar float\n");
-    printf("7 - Para representar double\n");
-    printf("Escolha: ");
-    scanf("%d", &escolha);
-
-    switch (escolha) {
-        case 1:
-            convertToBinary(num);
-            break;
-        case 2:
-            convertToOctal(num);
-            break;
-        case 3:
-            convertToHexadecimal(num);
-            break;
-        case 4:
-            convertToBCD(num);
-            break;
-        case 5:
-            convertTo16Bits(num);
-            break;
-        case 6:
-            printf("Digite um numero real para float: ");
-            scanf("%f", &fnum);
-            printFloatRepresentation(fnum);
-            break;
-        case 7:
-            printf("Digite um numero real para double: ");
-            scanf("%lf", &dnum);
-            printDoubleRepresentation(dnum);
-            break;
-        default:
-            printf("Escolha inválida!\n");
-            break;
-    }
-
+    menu();
     return 0;
 }
 
+void menu() {
+    int escolha, numero;
+    float numFloat;
+    double numDouble;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Converter para Binário\n");
+        printf("2. Converter para Octal\n");
+        printf("3. Converter para Hexadecimal\n");
+        printf("4. Converter para BCD\n");
+        printf("5. Converter para Complemento de 2\n");
+        printf("6. Converter Float para Binário\n");
+        printf("7. Converter Double para Binário\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &escolha);
+        printf("\n");
+
+        switch(escolha) {
+            case 1:
+                printf("Digite um número inteiro: ");
+                scanf("%d", &numero);
+                printf("Binário: ");
+                baseDois(numero);
+                printf("\n");
+                break;
+            case 2:
+                printf("Digite um número inteiro: ");
+                scanf("%d", &numero);
+                printf("Octal: ");
+                baseOito(numero);
+                printf("\n");
+                break;
+            case 3:
+                printf("Digite um número inteiro: ");
+                scanf("%d", &numero);
+                printf("Hexadecimal: ");
+                baseDezesseis(numero);
+                printf("\n");
+                break;
+            case 4:
+                printf("Digite um número inteiro: ");
+                scanf("%d", &numero);
+                printf("BCD: ");
+                baseBCD(numero);
+                printf("\n");
+                break;
+            case 5:
+                printf("Digite um número inteiro: ");
+                scanf("%d", &numero);
+                printf("Complemento de 2: ");
+                complemento2(numero);
+                printf("\n");
+                break;
+            case 6:
+                printf("Digite um número float: ");
+                scanf("%f", &numFloat);
+                floatToBinary(numFloat);
+                break;
+            case 7:
+                printf("Digite um número double: ");
+                scanf("%lf", &numDouble);
+                doubleToBinary(numDouble);
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida! Tente novamente.\n");
+                break;
+        }
+    } while (escolha != 0);
+}
+
+void baseDois(int numero) {
+    if (numero == 0) {
+        printf("0");
+        return;
+    }
+    int binario[32];
+    int i = 0;
+
+    while (numero > 0) {
+        binario[i] = numero % 2;
+        printf("%d / 2 = %d, resto = %d\n", numero, numero / 2, binario[i]);
+        numero = numero / 2;
+        i++;
+    }
+    
+    printf("Considere os números de trás para frente!\n");
+
+    printf("Resultado final em binário: ");
+    for (int j = i - 1; j >= 0; j--) {
+        printf("%d", binario[j]);
+    }
+    printf("\n");
+}
+
+void baseOito(int numero) {
+    if (numero == 0) {
+        printf("0");
+        return;
+    }
+    int octal[32];
+    int i = 0;
+
+    while (numero > 0) {
+        octal[i] = numero % 8;
+        printf("%d / 8 = %d, resto = %d\n", numero, numero / 8, octal[i]);
+        numero = numero / 8;
+        i++;
+    }
+    
+    printf("Considere os números de trás para frente!\n");
+    
+    printf("Resultado final em octal: ");
+    for (int j = i - 1; j >= 0; j--) {
+        printf("%d", octal[j]);
+    }
+    printf("\n");
+}
+
+void baseDezesseis(int numero) {
+    if (numero == 0) {
+        printf("0");
+        return;
+    }
+    char hexadecimal[32];
+    int i = 0;
+
+    while (numero > 0) {
+        int resto = numero % 16;
+        printf("%d / 16 = %d, resto = ", numero, numero / 16);
+        if (resto < 10) {
+            hexadecimal[i] = 48 + resto;
+            printf("%d\n", resto);
+        } else {
+            hexadecimal[i] = 55 + resto;
+            printf("%c\n", hexadecimal[i]);
+        }
+        numero = numero / 16;
+        i++;
+    }
+    
+    printf("Para o resto de divisão: 10-A, 11-B, 12-C, 13-D, 14-E, 15-F\n");
+    printf("Considere os números de trás para frente!\n");
+
+    printf("Resultado final em hexadecimal: ");
+    for (int j = i - 1; j >= 0; j--) {
+        printf("%c", hexadecimal[j]);
+    }
+    printf("\n");
+}
+
+void baseBCD(int numero) {
+    if (numero == 0) {
+        printf("0000\n");
+        return;
+    }
+    int digitos[10];
+    int i = 0;
+    
+    printf("O processo é fazer a conversão de binário de cada dígito separado (trás pra frente).\n");
+
+    while (numero > 0) {
+        digitos[i] = numero % 10;
+        printf("Dígito: %d\n", digitos[i]);
+        numero /= 10;
+        i++;
+    }
+
+    printf("Resultado final em BCD: ");
+    for (int j = i - 1; j >= 0; j--) {
+        int binario[4] = {0, 0, 0, 0};
+        int num = digitos[j];
+        int k = 3;
+
+        while (num > 0) {
+            binario[k] = num % 2;
+            num /= 2;
+            k--;
+        }
+
+        for (k = 0; k < 4; k++) {
+            printf("%d", binario[k]);
+        }
+        printf(" ");
+    }
+    printf("\n");
+}
+
+void complemento2(int numero){
+    if (numero < -32768 || numero > 32767) {
+        return;
+    }
+    
+    int novoNumero = -numero;
+    
+    uint16_t complemento;
+
+    if (novoNumero < 0) {
+        complemento = (uint16_t)(~(-novoNumero) + 1);
+    } else {
+        complemento = (uint16_t)novoNumero;
+    }
+
+    for (int i = 15; i >= 0; i--) {
+        printf("%d", (complemento >> i) & 1);
+    }
+}
+
+void printFloat(uint32_t num) {
+    for (int i = 31; i >= 0; i--) {
+        printf("%d", (num >> i) & 1);
+        if (i == 31 || i == 23) {
+            printf(" ");
+        }
+    }
+    printf("\n");
+}
+
+void printDouble(uint64_t num) {
+    for (int i = 63; i >= 0; i--) {
+        printf("%d", (num >> i) & 1);
+        if (i == 63 || i == 52) {
+            printf(" ");
+        }
+    }
+    printf("\n");
+}
+
+void floatToBinary(float numeroFloat) {
+    uint32_t *num = (uint32_t*)&numeroFloat;
+    uint32_t sinal = (*num >> 31) & 1;
+    uint32_t expoente = (*num >> 23) & 0xFF;
+    uint32_t fracao = *num & 0x7FFFFF;
+
+    printf("Float: %f\n", numeroFloat);
+    printf("Bits: ");
+    printFloat(*num);
+
+    printf("Sinal: %d\n", sinal);
+    printf("Expoente: %u\n", expoente);
+    printf("Expoente com viés: %d\n", expoente - 127);
+    printf("Fração: 0x%X\n", fracao);
+}
+
+void doubleToBinary(double numeroDouble) {
+    uint64_t *num = (uint64_t*)&numeroDouble;
+    uint64_t sinal = (*num >> 63) & 1;
+    uint64_t expoente = (*num >> 52) & 0x7FF;
+    uint64_t fracao = *num & 0xFFFFFFFFFFFFF;
+
+    printf("Double: %lf\n", numeroDouble);
+    printf("Bits: ");
+    printDouble(*num);
+
+    printf("Sinal: %llu\n", sinal);
+    printf("Expoente: %llu\n", expoente);
+    printf("Expoente com viés: %lld\n", (long long)(expoente - 1023));
+    printf("Fração: 0x%llX\n", fracao);
+}
