@@ -1,1 +1,3 @@
-Projeto de Infraestrutura de Hardware. Calculadora que converte números na base 10 para diferentes bases.
+# Calculadora de Bases (Infraestrutura de Hardware)
+
+Pequena calculadora que **converte números em base 10 para outras bases** (binário, octal, hexadecimal e bases personalizadas).
